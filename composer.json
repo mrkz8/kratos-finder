@@ -1,14 +1,24 @@
 {
-    "name": "zendframework/skeleton-application",
-    "description": "Skeleton Application for ZF2",
+    "name": "Rioxygen/kratos-finder",
+    "description": "Repositorio de Api y Sistema de Administración de dispositivos",
     "license": "BSD-3-Clause",
     "keywords": [
-        "framework",
-        "zf2"
+        "mobile device"
     ],
-    "homepage": "http://framework.zend.com/",
+    "homepage": "http://kratos.rioxygen.com/",
     "require": {
         "php": ">=5.5",
-        "zendframework/zendframework": "~2.5"
+        "zendframework/zendframework": "~2.5",
+        "bjyoungblood/bjy-profiler": "dev-master",
+        "doctrine/doctrine-orm-module" : "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "4.*",
+        "phploc/phploc": "*",
+        "phpmd/phpmd": "dev-master",
+        "sebastian/phpcpd": "2.0.*@dev",
+        "pdepend/pdepend" : "2.*",
+        "zendframework/zend-developer-tools" : "dev-master",
+        "firephp/firephp-core" : "dev-master"
     }
 }
