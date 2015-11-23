@@ -10,15 +10,24 @@
         "php": ">=5.5",
         "zendframework/zendframework": "~2.5",
         "bjyoungblood/bjy-profiler": "dev-master",
-        "doctrine/doctrine-orm-module" : "*"
+        "doctrine/doctrine-orm-module" : "*",
+        "twig/twig" : "1.*",
+        "zf-commons/zfc-twig" : "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*",
         "phploc/phploc": "*",
+        "squizlabs/php_codesniffer": "2.*",
+        "san/san-session-toolbar"  : "*",
         "phpmd/phpmd": "dev-master",
         "sebastian/phpcpd": "2.0.*@dev",
         "pdepend/pdepend" : "2.*",
         "zendframework/zend-developer-tools" : "dev-master",
         "firephp/firephp-core" : "dev-master"
+    },
+    "autoload" : {
+        "psr-0" : {
+            "Application"   : "module/Application/src"
+        }
     }
 }

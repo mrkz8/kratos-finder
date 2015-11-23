@@ -1,15 +1,18 @@
 <?php
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
-namespace Application;
 
 return array(
+    'controllers' => array(
+        'invokables' => array(
+            'Application\Controller\Api'        => 'Application\Controller\ApiController',
+            'Application\Controller\Index'      => 'Application\Controller\IndexController',
+            'Application\Controller\Dashboard'  => 'Application\Controller\DashboardController',
+        ),
+    ),
+    'controller_plugins' => array(
+        'invokables' => array(
+            'Params' => 'Application\Controller\Plugin\Params',
+        ),
+    ),
     'router' => array(
         'routes' => array(
             'home' => array(
@@ -29,7 +32,7 @@ return array(
             'application' => array(
                 'type'    => 'Literal',
                 'options' => array(
-                    'route'    => '/application',
+                    'route'    => '/',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Application\Controller',
                         'controller'    => 'Index',
@@ -41,7 +44,7 @@ return array(
                     'default' => array(
                         'type'    => 'Segment',
                         'options' => array(
-                            'route'    => '/[:controller[/:action]]',
+                            'route'    => '[:controller[/:action]]',
                             'constraints' => array(
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
@@ -49,6 +52,18 @@ return array(
                             'defaults' => array(
                             ),
                         ),
+                    ),
+                ),
+            ),
+            'findme' => array(
+                'type'    => 'Literal',
+                'options' => array(
+                    'route'    => '/apiDevice',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Api',
                     ),
                 ),
             ),
@@ -60,7 +75,10 @@ return array(
             'Zend\Log\LoggerAbstractServiceFactory',
         ),
         'factories' => array(
-            'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
+            'secure' => 'Application\Factory\SecureServiceFactory'
+        ),
+        'aliases' => array(
+            'translator' => 'MvcTranslator',
         ),
     ),
     'translator' => array(
@@ -73,32 +91,53 @@ return array(
             ),
         ),
     ),
-    'controllers' => array(
-        'invokables' => array(
-            'Application\Controller\Index' => Controller\IndexController::class
-        ),
-    ),
     'view_manager' => array(
         'display_not_found_reason' => true,
-        'display_exceptions'       => true,
-        'doctype'                  => 'HTML5',
-        'not_found_template'       => 'error/404',
-        'exception_template'       => 'error/index',
-        'template_map' => array(
-            'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
-            'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
-            'error/404'               => __DIR__ . '/../view/error/404.phtml',
-            'error/index'             => __DIR__ . '/../view/error/index.phtml',
-        ),
+            'display_exceptions'       => true,
+            'doctype'                  => 'HTML5',
+            'not_found_template'       => 'error/404',
+            'exception_template'       => 'error/index',
+            'template_map' => array(
+                'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
+                'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
+                'error/404'               => __DIR__ . '/../view/error/404.phtml',
+                'error/index'             => __DIR__ . '/../view/error/index.phtml',
+            ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
         ),
-    ),
-    // Placeholder for console routes
-    'console' => array(
-        'router' => array(
-            'routes' => array(
-            ),
+        'strategies' => array(
+            'ViewJsonStrategy',
         ),
     ),
+    'zfctwig' => array(
+        'environment_loader' => 'ZfcTwigLoaderChain',
+        'environment_options' => array(
+            'debug' => true
+        ),
+        'environment_class' => 'Twig_Environment',
+        'loader_chain' => array(
+            'ZfcTwigLoaderTemplateMap',
+            'ZfcTwigLoaderTemplatePathStack'
+        ),
+        'extensions' => array(
+            'zfctwig' => 'ZfcTwigExtension'
+        ),
+        'suffix' => 'twig',
+        'disable_zf_model' => true,
+    ),
+    'doctrine' => array(
+        'driver' => array(
+            'application_entities' => array(
+                'class' =>'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'cache' => 'array',
+                'paths' => array(__DIR__ . '/../src/Application/Entity')
+            ),
+            'orm_default' => array(
+                'drivers' => array(
+                    'Application\Entity' => 'application_entities'
+                )
+            )
+        )
+    )
 );

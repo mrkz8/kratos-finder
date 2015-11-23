@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MarketPlace" default="build">
+    <target name="build" depends="prepare, lint, composer, prepareHome, phploc, pdepend, phpmd-ci, phpcs-ci, phpcpd, phpdox, phpunit, composerProduction"/>
+    <target name="build-parallel" depends="prepare, lint, tools-parallel, phpunit"/>
+    <target name="tools-parallel" description="Run tools in parallel">
+        <parallel threadCount="2">
+            <sequential>
+                <antcall target="pdepend"/>
+                <antcall target="phpmd-ci"/>
+            </sequential>
+            <antcall target="phpcpd"/>
+            <antcall target="phpcs-ci"/>
+            <antcall target="phploc"/>
+            <antcall target="phpdox"/>
+        </parallel>
+    </target>
+    <!-- borra carpetas -->
+    <target name="clean" description="Cleanup build artifacts">
+        <delete dir="${basedir}/bower_components"/>
+        <delete dir="${basedir}/node_modules"/>
+        <delete dir="${basedir}/vendor"/>
+        <delete dir="${basedir}/build/api"/>
+        <delete dir="${basedir}/build/coverage"/>
+        <delete dir="${basedir}/build/logs"/>
+        <delete dir="${basedir}/build/pdepend"/>
+        <delete dir="${basedir}/build/phpdox"/>
+    </target>
+    <target name="prepare" depends="clean" description="Prepare for build">
+        <mkdir dir="${basedir}/bower_components"/>
+        <mkdir dir="${basedir}/node_modules"/>
+        <mkdir dir="${basedir}/vendor"/>
+        <mkdir dir="${basedir}/build/api"/>
+        <mkdir dir="${basedir}/build/coverage"/>
+        <mkdir dir="${basedir}/build/logs"/>
+        <mkdir dir="${basedir}/build/pdepend"/>
+        <mkdir dir="${basedir}/build/phpdox"/>
+    </target>
+    <target name="lint" description="Perform syntax check of sourcecode files">
+        <apply executable="php" failonerror="true">
+            <arg value="-l" />
+            <fileset dir="${basedir}/">
+                <include name="**/*.php" />
+                    <include name="**/*.phtml" />
+             <modified />
+            </fileset>
+        </apply>
+    </target>
+    <target name="compass" description="Crea el css">
+        <exec executable="compass">
+            <arg value="compile"/>
+            <arg value="-e" />
+            <arg value="production" />
+        </exec>
+    </target>
+    <target name="composerUpdate" description="Update dependencies with Composer">
+        <exec executable="php">
+            <arg value="${basedir}/composer.phar"/>
+            <arg value="self-update"/>
+        </exec>
+    </target>
+    <target name="composerProduction" description="Optimization dependencies with Composer">
+        <exec executable="php">
+            <arg value="${basedir}/composer.phar"/>
+            <arg value="update" />
+            <arg value="--no-dev" />
+            <arg value="-o" />
+        </exec>
+    </target>
+    <target name="composer" description="Install dependencies with Composer">
+        <exec executable="php">
+            <arg value="${basedir}/composer.phar"/>
+            <arg value="update" />
+            <arg value="-o" />
+        </exec>
+    </target>
+    <target name="prepareHome" description="Copiar archivos para instlar el zft">
+        <exec executable="sh">
+            <arg value="${basedir}/scripts/script.sh"/>
+        </exec>
+    </target>
+    <target name="phploc" description="Measure project size using PHPLOC">
+        <exec executable="${basedir}/vendor/phploc/phploc/phploc">
+            <arg value="--count-tests"/>
+            <arg value="--log-csv" />
+            <arg value="${basedir}/build/logs/phploc.csv" />
+            <arg value="--log-xml" />
+            <arg value="${basedir}/build/logs/phploc.xml" />
+            <arg path="${basedir}/module" />
+            <arg path="${basedir}/tests" />
+        </exec>
+    </target>
+    <target name="pdepend" description="Calculate software metrics using PHP_Depend">
+        <exec executable="${basedir}/vendor/pdepend/pdepend/src/bin/pdepend">
+            <arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml" />
+            <arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg" />
+            <arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg" />
+            <arg path="${basedir}/module" />
+        </exec>
+    </target>
+    <target name="phpmd" description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
+        <exec executable="${basedir}/vendor/phpmd/phpmd/src/bin/phpmd">
+            <arg path="${basedir}/module" />
+            <arg value="text" />
+            <arg value="${basedir}/build/phpmd.xml" />
+        </exec>
+    </target>
+    <target name="phpmd-ci" description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
+        <exec executable="${basedir}/vendor/phpmd/phpmd/src/bin/phpmd">
+            <arg path="${basedir}/module" />
+            <arg value="xml" />
+            <arg value="${basedir}/build/phpmd.xml" />
+            <arg value="--reportfile" />
+            <arg value="${basedir}/build/logs/pmd.xml" />
+        </exec>
+    </target>
+    <target name="phpcs" description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
+        <exec executable="${basedir}/build/tools/phpcs.phar">
+            <arg value="--standard=PSR2" />
+            <arg value="--extensions=php" />
+            <arg value="--ignore=autoload.php" />
+            <arg path="${basedir}/module" />
+        </exec>
+    </target>
+    <target name="phpcs-ci" description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
+        <exec executable="${basedir}/build/tools/phpcs.phar" output="/dev/null">
+            <arg value="--report=checkstyle" />
+            <arg value="--report-file=${basedir}/build/logs/checkstyle.xml" />
+            <arg value="--standard=PSR2" />
+            <arg value="--extensions=php" />
+            <arg value="--ignore=autoload.php" />
+            <arg path="${basedir}/module" />
+        </exec>
+    </target>
+    <target name="phpcpd" description="Find duplicate code using PHPCPD">
+        <exec executable="${basedir}/build/tools/phpcpd.phar">
+            <arg value="--log-pmd" />
+            <arg value="${basedir}/build/logs/pmd-cpd.xml" />
+            <arg path="${basedir}/module" />
+        </exec>
+    </target>
+    <target name="phpdox" description="Generate API documentation using phpDox">
+        <exec executable="${basedir}/build/tools/phpdox.phar" dir="${basedir}/build"/>
+    </target>
+    <target name="phpunit" description="Run unit tests with PHPUnit">
+        <exec executable="${basedir}/vendor/phpunit/phpunit/phpunit" failonerror="true">
+            <arg value="-c${basedir}/build/phpunit.xml"/>
+        </exec>
+    </target>
+    <target name="npmgulp"  description="Dependencias">
+        <exec executable="npm" >
+            <arg value="install" />
+            <arg value="--save-dev" />
+            <arg value="gulp" />
+        </exec>
+    </target>
+    <target name="npmgulpUtil"  description="Dependencias">
+        <exec executable="npm" >
+            <arg value="install" />
+            <arg value="--save-dev" />
+            <arg value="gulp-util" />
+        </exec>
+    </target>
+    <target name="npmgulpUglify"  description="Dependencias">
+        <exec executable="npm" >
+            <arg value="install" />
+            <arg value="--save-dev" />
+            <arg value="gulp-uglify" />
+        </exec>
+    </target>
+    <target name="npmgulpConcat"  description="Dependencias">
+        <exec executable="npm" >
+            <arg value="install" />
+            <arg value="--save-dev" />
+            <arg value="gulp-concat" />
+        </exec>
+    </target>
+    <target name="gulp" depends="npmgulp, npmgulpUtil, npmgulpUglify, npmgulpConcat" description="Crea el js">
+        <exec executable="gulp" />
+    </target>
+</project>
