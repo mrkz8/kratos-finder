@@ -18,6 +18,7 @@ $modules = array(
 if ($env == 'development') {
     $modules[] = 'ZendDeveloperTools';
     $modules[] = 'SanSessionToolbar';
+    $modules[] = 'OcraServiceManager';
 }
 
 return array(
