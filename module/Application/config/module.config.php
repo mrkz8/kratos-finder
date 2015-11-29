@@ -9,9 +9,9 @@ return array(
         ),
     ),
     'controller_plugins' => array(
-        'invokables' => array(
+        /*'invokables' => array(
             'Params' => 'Application\Controller\Plugin\Params',
-        ),
+        ),*/
     ),
     'router' => array(
         'routes' => array(
@@ -55,18 +55,22 @@ return array(
                     ),
                 ),
             ),
-            'findme' => array(
-                'type'    => 'Literal',
+            'api' => array(
+                'type' => 'segment',
                 'options' => array(
-                    'route'    => '/apiDevice',
-                    'constraints' => array(
-                        'id'     => '[0-9]+',
-                    ),
+                    'route' => '/api/[:action]',
+                    /*'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[a-zA-Z0-9_-]*',
+                        'xmln' => '[a-zA-Z0-9_-]*',
+                        'xmlc' => '[*a-zA-Z0-9_-]*',
+                    ),*/
                     'defaults' => array(
                         'controller' => 'Application\Controller\Api',
-                    ),
+                        'action'     => 'index',
+                    )
                 ),
-            ),
+            )
         ),
     ),
     'service_manager' => array(
@@ -98,8 +102,8 @@ return array(
             'not_found_template'       => 'error/404',
             'exception_template'       => 'error/index',
             'template_map' => array(
-                'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
-                'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
+                'layout/layout'           => __DIR__ . '/../view/layout/layout.twig',
+                'application/index/index' => __DIR__ . '/../view/application/index/index.twig',
                 'error/404'               => __DIR__ . '/../view/error/404.phtml',
                 'error/index'             => __DIR__ . '/../view/error/index.phtml',
             ),
