@@ -11,7 +11,7 @@ namespace Application;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
-
+use Application\Form\LoginForm;
 /**
  * Clase para la configuracion global de la aplicacion
  */
@@ -47,6 +47,21 @@ class Module
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),
             ),
+        );
+    }
+    /**
+     * Inyecta las depencias que se necesitan
+     * @return array
+     */
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'loginForm'=> function($sm) {
+                    $formulario = new LoginForm();
+                    return $formulario;
+                }
+            )
         );
     }
 }
