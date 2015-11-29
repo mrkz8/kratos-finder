@@ -16,7 +16,7 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        $formulario = $this->getServiceLocator('loginForm');
+        $formulario = $this->getServiceLocator()->get('loginForm');
         $params =  array(
             'form'          => $formulario
         );
