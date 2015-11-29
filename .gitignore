@@ -21,3 +21,7 @@ temp/
 # Legacy ZF1
 demos/
 extras/documentation
+
+#
+.sass-cache
+.sass-cache/*
